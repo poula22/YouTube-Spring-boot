@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: channel-microservice
+          uri: lb://channel-microservice
+          predicates:
+            - Path= /channel/**
+        - id: user-microservice
+          uri: lb://user-microservice
+          predicates:
+            - Path= /user/**
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+   hostname: localhost
