@@ -1,4 +1,4 @@
-package com.example.channelmicroservice.domain;
+package com.example.channelmicroservice.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,32 +11,35 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "channel", schema = "youtube")
+@Table(name = "channel")
 public class ChannelEntity {
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "id")
     private long id;
     @Basic
     @Column(name = "name")
     private String name;
     @Basic
-    @Column(name = "ownerId")
+    @Column(name = "owner_id")
     private long ownerId;
     @Basic
-    @Column(name = "subscribersCount")
+    @Column(name = "subscribers_count")
     private int subscribersCount;
+    @Basic
+    @Column(name = "category")
+    private String category;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelEntity that = (ChannelEntity) o;
-        return id == that.id && ownerId == that.ownerId && subscribersCount == that.subscribersCount && Objects.equals(name, that.name);
+        return id == that.getId() && ownerId == that.getOwnerId() && subscribersCount == that.getSubscribersCount() && Objects.equals(name, that.getName()) && Objects.equals(category, that.getCategory());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, ownerId, subscribersCount);
+        return Objects.hash(id, name, ownerId, subscribersCount, category);
     }
 }

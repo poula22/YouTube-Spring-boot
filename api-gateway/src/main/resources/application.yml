@@ -11,6 +11,9 @@ spring:
           uri: lb://channel-microservice
           predicates:
             - Path= /channel/**
+          filters:
+            - RewritePath=/service(?<segment>/?.*), $\{segment}
+            - name: RoleAuth
         - id: user-microservice
           uri: lb://user-microservice
           predicates:
@@ -24,3 +27,6 @@ eureka:
 
   instance:
    hostname: localhost
+
+#jwt:
+#  secret: eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTcyNDcwODAzNywiaWF0IjoxNzI0NzA4MDM3fQ.n2NsdJ0OtCtxYAGo-PvtBajVzjiuoX9eBNYAYzSDreI

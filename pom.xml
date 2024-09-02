@@ -23,6 +23,7 @@
     </developers>
     <modules>
         <module>core</module>
+        <module>authentication</module>
     </modules>
     <scm>
         <connection/>

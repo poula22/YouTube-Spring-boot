@@ -1,4 +1,4 @@
-package com.example.api;
+package com.example.bussiness.model;
 
 public sealed interface ApiResponse {
     record Success<T>(T data)  implements ApiResponse{}
