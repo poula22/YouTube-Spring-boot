@@ -1,24 +1,17 @@
 package com.example.controller;
 
-import com.example.bussiness.model.ApiResponse;
+import com.example.controller.exception.HttpRequestException;
 import org.springframework.validation.BindingResult;
 
-import java.util.function.Supplier;
-
 public class ControllerRequestHandler {
-    private static ApiResponse.Error onError(BindingResult bindingResult) {
+    private static void onError(BindingResult bindingResult) throws HttpRequestException {
             var error = bindingResult.getAllErrors().get(0);
-            return new ApiResponse.Error("400", error.getDefaultMessage());
+            throw new HttpRequestException(error.getDefaultMessage(),400);
     }
 
-    private static <T> ApiResponse.Success<T> onSuccess(T response) {
-        return new ApiResponse.Success<>(response);
-    }
-
-    public static <T> ApiResponse handleRequest(T response, BindingResult bindingResult)
-    throws Exception{
-        if (bindingResult.hasErrors()) return onError(bindingResult);
-        return onSuccess(response);
+    public static  void handleRequest(BindingResult bindingResult)
+    throws HttpRequestException{
+        if (bindingResult!= null && bindingResult.hasErrors()) onError(bindingResult);
     }
 
 }

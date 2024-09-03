@@ -52,8 +52,7 @@ public class JwtUtil {
     public JwtSecurityModel extractUser(String token) {
         String userStr = extractClaim(token,Claims::getSubject);
         try {
-            JwtSecurityModel user = objectMapper.readValue(userStr,JwtSecurityModel.class);
-            return user;
+            return objectMapper.readValue(userStr,JwtSecurityModel.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -68,6 +67,7 @@ public class JwtUtil {
             throw new RuntimeException(e);
         }
     }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -77,5 +77,4 @@ public class JwtUtil {
                 .signWith(key)
                 .compact();
     }
-
 }

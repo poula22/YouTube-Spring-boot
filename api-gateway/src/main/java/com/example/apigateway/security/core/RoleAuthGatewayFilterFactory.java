@@ -24,10 +24,9 @@ import reactor.core.publisher.Mono;
 public class RoleAuthGatewayFilterFactory
         extends AbstractGatewayFilterFactory<RoleAuthGatewayFilterFactory.Config> {
 
-    private final JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil = new JwtUtil();;
     public RoleAuthGatewayFilterFactory() {
         super(Config.class);
-        jwtUtil = new JwtUtil();
     }
 
     @Override
@@ -36,17 +35,17 @@ public class RoleAuthGatewayFilterFactory
             final ServerHttpRequest request = exchange.getRequest();
             final ServerHttpResponse response = exchange.getResponse();
 
-
-//            if (request.getPath().contextPath().value().contains("/user/")) return chain.filter(exchange);
-
             if (isAuthMissing(request)) {
                 return onError(response, "token is missing", HttpStatus.UNAUTHORIZED);
             }
+
             final String token = getTokenFromRequest(request);
-            log.info(token);
+
             if (!jwtUtil.validateToken(token)) {
                 return onError(response, "token is invalid", HttpStatus.UNAUTHORIZED);
             }
+            
+
 //            UserDetails userDetails = User.builder()
 //                    .username(jwtUtil.extractUser(token))
 //                    .password("")
@@ -80,7 +79,7 @@ public class RoleAuthGatewayFilterFactory
         ObjectMapper objectMapper = new ObjectMapper();
         byte[] errorBytes;
         try {
-            errorBytes = objectMapper.writeValueAsBytes(new ApiResponse.Error("401", errorMessage));
+            errorBytes = objectMapper.writeValueAsBytes(new ApiResponse.Error(401, errorMessage));
             objectMapper.writeValueAsBytes(response.bufferFactory().wrap(errorBytes));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

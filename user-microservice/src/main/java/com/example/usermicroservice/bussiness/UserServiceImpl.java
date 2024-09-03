@@ -31,14 +31,12 @@ public class UserServiceImpl implements UserService, AuthService {
         entityHelper.notNull(user);
         return user;
     }
-
     @Override
     public UserEntity saveAndUpdateUserInfo(UserEntity userEntity) throws CustomEntityException {
         entityHelper.notNull(userEntity);
         userJpaRepository.save(userEntity);
         return userEntity;
     }
-
     @Override
     public AuthResponseDto login(LoginRequestDto request) throws CustomAuthException, CustomEntityException {
         entityHelper.notNull(request);
@@ -52,7 +50,6 @@ public class UserServiceImpl implements UserService, AuthService {
         String token = jwtUtil.generateToken(UserMapper.INSTANCE.fromEntityToSecurity(user));
         return new AuthResponseDto(token);
     }
-
     @Override
     public AuthResponseDto signUp(SignUpRequestDto user) throws CustomAuthException, CustomEntityException {
         entityHelper.notNull(user);

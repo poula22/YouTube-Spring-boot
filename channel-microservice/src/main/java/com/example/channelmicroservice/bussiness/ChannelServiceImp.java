@@ -27,9 +27,10 @@ public class ChannelServiceImp implements ChannelService {
     @Override
     public ChannelEntity loadChannelById(long id) throws ChannelException {
         var channel = channelRepository.findById(id).orElse(null);
-        if (channel == null) throw new ChannelException("channel not found");
+        if (channel == null) throw new ChannelException(404, "channel not found");
         return channel;
     }
+
     @Override
     public ChannelDto addChannel(ChannelDto channel, long ownerId) throws ChannelException {
         try {
@@ -39,63 +40,64 @@ public class ChannelServiceImp implements ChannelService {
             return channel;
         } catch (Exception e) {
             log.info(e.getMessage());
-            throw new ChannelException("channel already exist");
+            throw new ChannelException(400, "channel already exist");
         }
     }
+
     @Override
     public List<ChannelDto> loadAllChannels() throws ChannelException {
         var channels = channelRepository.findAll();
 
-        if (channels.isEmpty()) throw new ChannelException("No Channel Found");
+        if (channels.isEmpty()) throw new ChannelException(404, "No Channel Found");
 
         return channels
                 .stream()
                 .map(ChannelMapper.INSTANCE::fromEntityToDto)
                 .toList();
     }
+
     @Override
     public List<ChannelDto> loadAllChannelsByOwnerId(long ownerId) throws ChannelException {
         var channels = channelRepository.findAllByOwnerId(ownerId);
-        if (channels.isEmpty()) throw new ChannelException("user doesn't have any channel yet");
+        if (channels.isEmpty()) throw new ChannelException(200, "user doesn't have any channel yet");
         return channels.stream()
                 .map(ChannelMapper.INSTANCE::fromEntityToDto)
                 .toList();
     }
 
     @Override
-    public Boolean removeChannelById(long id) {
+    public void removeChannelById(long id) throws ChannelException {
         try {
             channelRepository.deleteById(id);
-            return true;
         } catch (Exception e) {
-            return false;
+            throw new ChannelException(400, "user doesn't have access to this channel");
         }
     }
 
     @Override
     public List<ChannelSearchAutoCompleteDto> channelSearchAutoCompleteDto(String name, int page)
             throws ChannelException {
-            int pageSize = 5;
-            log.info(name);
-            var channels = channelPaginationRepository
-                    .findChannelEntitiesByCategory(
-                            name,
-                            Pageable.ofSize(pageSize).withPage(page)
-                    ).stream()
-                    .map(channelEntity -> new ChannelSearchAutoCompleteDto(
-                            channelEntity.getId(),
-                            channelEntity.getCategory()
-                    )).toList();
+        int pageSize = 5;
+        log.info(name);
+        var channels = channelPaginationRepository
+                .findChannelEntitiesByCategory(
+                        name,
+                        Pageable.ofSize(pageSize).withPage(page)
+                ).stream()
+                .map(channelEntity -> new ChannelSearchAutoCompleteDto(
+                        channelEntity.getId(),
+                        channelEntity.getCategory()
+                )).toList();
 
-            if (channels.isEmpty()) throw new ChannelException("No result to show");
-            return channels;
+        if (channels.isEmpty()) throw new ChannelException(200, "No result to show");
+        return channels;
     }
 
     @Override
     public List<ChannelDto> loadRecommendedChannelsByCategory(String category) throws ChannelException {
         var channels = channelRepository.findAllByCategory(category, Limit.of(5));
 
-        if (channels.isEmpty()) throw new ChannelException("no channels to show");
+        if (channels.isEmpty()) throw new ChannelException(200,"no channels to show");
 
         return channels.stream()
                 .map(ChannelMapper.INSTANCE::fromEntityToDto)

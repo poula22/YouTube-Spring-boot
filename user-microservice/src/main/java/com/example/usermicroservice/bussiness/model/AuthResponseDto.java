@@ -1,3 +1,3 @@
 package com.example.usermicroservice.bussiness.model;
 
-public record AuthResponseDto(String jwt) {}
+public record AuthResponseDto(String accessToken) {}

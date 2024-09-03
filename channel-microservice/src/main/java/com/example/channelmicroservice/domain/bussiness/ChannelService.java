@@ -12,7 +12,7 @@ public interface ChannelService {
     ChannelDto addChannel(ChannelDto channel,long ownerId) throws ChannelException;
     List<ChannelDto> loadAllChannels() throws ChannelException;
     List<ChannelDto> loadAllChannelsByOwnerId(long ownerId) throws ChannelException;
-    Boolean removeChannelById(long id);
+    void removeChannelById(long id) throws ChannelException;
     List<ChannelSearchAutoCompleteDto> channelSearchAutoCompleteDto(String name, int  page) throws ChannelException;
     List<ChannelDto> loadRecommendedChannelsByCategory(String category) throws ChannelException;
 }
