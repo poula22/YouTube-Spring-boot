@@ -1,5 +1,6 @@
 package com.example.util;
 
+import com.example.controller.exception.HttpRequestException;
 import com.example.security.model.JwtSecurityModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,12 +21,12 @@ public class JwtUtil {
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws HttpRequestException {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) throws HttpRequestException {
 
         try {
             return Jwts.parserBuilder()
@@ -33,23 +34,24 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token).getBody();
         }catch (Exception e) {
-            throw e; // custom Error
+            throw new HttpRequestException("token is invalid: Can't parse token",401);// custom Error
         }
     }
 
-    public Boolean validateToken(String token) {
-        return !isTokenExpired(token);
+    public void validateToken(String token) throws HttpRequestException {
+        final boolean isExpired = isTokenExpired(token);
+        if (isExpired) throw new HttpRequestException("Token is invalid: Expired",401);
     }
 
-    private Boolean isTokenExpired(String token) {
+    private Boolean isTokenExpired(String token) throws HttpRequestException {
         return extractExpiration(token).before(new Date());
     }
 
-    public Date extractExpiration(String token) {
+    public Date extractExpiration(String token) throws HttpRequestException {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public JwtSecurityModel extractUser(String token) {
+    public JwtSecurityModel extractUser(String token) throws HttpRequestException {
         String userStr = extractClaim(token,Claims::getSubject);
         try {
             return objectMapper.readValue(userStr,JwtSecurityModel.class);

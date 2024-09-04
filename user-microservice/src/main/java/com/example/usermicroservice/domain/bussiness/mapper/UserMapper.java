@@ -1,4 +1,4 @@
-package com.example.usermicroservice.bussiness.mapper;
+package com.example.usermicroservice.domain.bussiness.mapper;
 
 import com.example.usermicroservice.domain.entity.UserEntity;
 import com.example.security.model.JwtSecurityModel;

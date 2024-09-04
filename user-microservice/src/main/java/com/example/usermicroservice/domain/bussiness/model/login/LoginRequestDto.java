@@ -1,4 +1,4 @@
-package com.example.usermicroservice.bussiness.model.login;
+package com.example.usermicroservice.domain.bussiness.model.login;
 
 import com.example.domain.customValidation.password.CustomPasswordValidation;
 

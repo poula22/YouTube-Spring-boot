@@ -1,4 +1,4 @@
-package com.example.usermicroservice.bussiness.exception;
+package com.example.usermicroservice.domain.bussiness.exception;
 
 public class CustomAuthException extends Exception {
     public CustomAuthException(String message) {

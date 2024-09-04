@@ -1,5 +1,6 @@
 package com.example.apigateway.security.core;
 
+import com.example.controller.exception.HttpRequestException;
 import com.example.util.JwtUtil;
 import com.example.bussiness.model.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,19 +13,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
 @Slf4j
 @Component
 public class RoleAuthGatewayFilterFactory
         extends AbstractGatewayFilterFactory<RoleAuthGatewayFilterFactory.Config> {
 
-    private final JwtUtil jwtUtil = new JwtUtil();;
+    private final JwtUtil jwtUtil = new JwtUtil();
     public RoleAuthGatewayFilterFactory() {
         super(Config.class);
     }
@@ -32,36 +29,20 @@ public class RoleAuthGatewayFilterFactory
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            final ServerHttpRequest request = exchange.getRequest();
             final ServerHttpResponse response = exchange.getResponse();
-
-            if (isAuthMissing(request)) {
-                return onError(response, "token is missing", HttpStatus.UNAUTHORIZED);
+            final ServerHttpRequest request = exchange.getRequest();
+            try {
+                final String token = getTokenFromRequest(request);
+                jwtUtil.validateToken(token);
+            } catch (HttpRequestException requestException) {
+                return onError(response, requestException.getMessage());
             }
-
-            final String token = getTokenFromRequest(request);
-
-            if (!jwtUtil.validateToken(token)) {
-                return onError(response, "token is invalid", HttpStatus.UNAUTHORIZED);
-            }
-            
-
-//            UserDetails userDetails = User.builder()
-//                    .username(jwtUtil.extractUser(token))
-//                    .password("")
-//                    .build();
-//
-//            // Set auth details
-//            var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//            authentication.setDetails(new WebAuthenticationDetails(request.getRemoteAddress().getHostString(),"12332134515"));
-
-            // Inform the security context about auth details
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
             return chain.filter(exchange);
         };
     }
 
-    private String getTokenFromRequest(ServerHttpRequest request) {
+    private String getTokenFromRequest(ServerHttpRequest request) throws HttpRequestException {
+        if (isAuthMissing(request)) throw new HttpRequestException("token is missing", 401);
         return request.getHeaders().getOrEmpty("Authorization").get(0);
     }
 
@@ -69,8 +50,8 @@ public class RoleAuthGatewayFilterFactory
         return !request.getHeaders().containsKey("Authorization");
     }
 
-    private Mono<Void> onError(ServerHttpResponse response, String errorMessage, HttpStatus httpStatus) {
-        response.setStatusCode(httpStatus);
+    private Mono<Void> onError(ServerHttpResponse response, String errorMessage) {
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         return writeResponseAsJson(errorMessage, response);
     }

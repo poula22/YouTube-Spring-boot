@@ -1,4 +1,4 @@
-package com.example.channelmicroservice.controller.model;
+package com.example.channelmicroservice.domain.bussiness.model;
 
 public record ChannelDto (
     String name,

@@ -1,10 +1,7 @@
 package com.example.usermicroservice.domain.bussiness.helper;
 
-import com.example.bussiness.validation.RequestValidator;
-import com.example.bussiness.validation.validator.EmailValidator;
 import com.example.domain.entityException.CustomEntityException;
 import com.example.domain.entityHelper.EntityHelper;
-import com.example.usermicroservice.bussiness.exception.CustomAuthException;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 

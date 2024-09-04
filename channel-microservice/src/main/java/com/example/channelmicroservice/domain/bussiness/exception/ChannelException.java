@@ -1,4 +1,4 @@
-package com.example.channelmicroservice.bussiness.exception;
+package com.example.channelmicroservice.domain.bussiness.exception;
 
 import lombok.Getter;
 

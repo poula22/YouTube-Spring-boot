@@ -1,4 +1,4 @@
-package com.example.usermicroservice.bussiness.model.signUp;
+package com.example.usermicroservice.domain.bussiness.model.signUp;
 
 
 import com.example.domain.customValidation.email.CustomEmailValidation;

@@ -1,6 +1,6 @@
-package com.example.channelmicroservice.bussiness.mapper;
+package com.example.channelmicroservice.domain.bussiness.mapper;
 
-import com.example.channelmicroservice.controller.model.ChannelDto;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelDto;
 import com.example.channelmicroservice.domain.entity.ChannelEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

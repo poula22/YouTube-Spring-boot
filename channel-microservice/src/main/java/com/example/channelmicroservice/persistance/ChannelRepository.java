@@ -12,4 +12,7 @@ import java.util.List;
 public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
     List<ChannelEntity> findAllByOwnerId(long ownerId);
     List<ChannelEntity> findAllByCategory(String category, Limit limit);
+    ChannelEntity findFirstByName(String name);
+    @Query("FROM ChannelEntity where name like concat(:name,'%') ")
+    List<ChannelEntity> searchAllByName(String name);
 }

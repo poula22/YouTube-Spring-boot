@@ -1,14 +1,13 @@
 package com.example.channelmicroservice.bussiness;
 
-import com.example.channelmicroservice.bussiness.exception.ChannelException;
-import com.example.channelmicroservice.bussiness.mapper.ChannelMapper;
-import com.example.channelmicroservice.controller.model.ChannelDto;
-import com.example.channelmicroservice.controller.model.ChannelSearchAutoCompleteDto;
+import com.example.channelmicroservice.domain.bussiness.exception.ChannelException;
+import com.example.channelmicroservice.domain.bussiness.mapper.ChannelMapper;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelDto;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelSearchAutoCompleteDto;
 import com.example.channelmicroservice.domain.bussiness.ChannelService;
 import com.example.channelmicroservice.domain.entity.ChannelEntity;
 import com.example.channelmicroservice.persistance.ChannelPaginationRepository;
 import com.example.channelmicroservice.persistance.ChannelRepository;
-import com.example.domain.entityHelper.EntityHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -45,6 +45,27 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
+    public ChannelDto updateChannelName(String newName, long channelId, long ownerId) throws ChannelException {
+        ChannelEntity entity = channelRepository.findFirstByName(newName);
+        if (entity != null) throw new ChannelException(400, "Name already exist");
+
+        Optional<ChannelEntity> oldEntityOptional = channelRepository.findById(channelId);
+        ChannelEntity updatedEntity = oldEntityOptional.map((oldEntity) -> {
+            oldEntity.setName(newName);
+            return oldEntity;
+        }).orElseThrow(() -> new ChannelException(400, "Bad Operation"));
+
+        if (updatedEntity.getOwnerId() != ownerId) throw new ChannelException(401, "unAuthorized");
+        try {
+            channelRepository.save(updatedEntity);
+            return ChannelMapper.INSTANCE.fromEntityToDto(updatedEntity);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            throw new ChannelException(400, "something went wrong");
+        }
+    }
+
+    @Override
     public List<ChannelDto> loadAllChannels() throws ChannelException {
         var channels = channelRepository.findAll();
 
@@ -58,7 +79,16 @@ public class ChannelServiceImp implements ChannelService {
 
     @Override
     public List<ChannelDto> loadAllChannelsByOwnerId(long ownerId) throws ChannelException {
-        var channels = channelRepository.findAllByOwnerId(ownerId);
+        final List<ChannelEntity> channels = channelRepository.findAllByOwnerId(ownerId);
+        if (channels.isEmpty()) throw new ChannelException(200, "user doesn't have any channel yet");
+        return channels.stream()
+                .map(ChannelMapper.INSTANCE::fromEntityToDto)
+                .toList();
+    }
+
+    @Override
+    public List<ChannelDto> loadAllChannelsByOwnerName(String ownerName) throws ChannelException {
+        var channels = channelRepository.searchAllByName(ownerName);
         if (channels.isEmpty()) throw new ChannelException(200, "user doesn't have any channel yet");
         return channels.stream()
                 .map(ChannelMapper.INSTANCE::fromEntityToDto)
@@ -83,8 +113,7 @@ public class ChannelServiceImp implements ChannelService {
                 .findChannelEntitiesByCategory(
                         name,
                         Pageable.ofSize(pageSize).withPage(page)
-                ).stream()
-                .map(channelEntity -> new ChannelSearchAutoCompleteDto(
+                ).stream().map(channelEntity -> new ChannelSearchAutoCompleteDto(
                         channelEntity.getId(),
                         channelEntity.getCategory()
                 )).toList();
@@ -97,7 +126,7 @@ public class ChannelServiceImp implements ChannelService {
     public List<ChannelDto> loadRecommendedChannelsByCategory(String category) throws ChannelException {
         var channels = channelRepository.findAllByCategory(category, Limit.of(5));
 
-        if (channels.isEmpty()) throw new ChannelException(200,"no channels to show");
+        if (channels.isEmpty()) throw new ChannelException(200, "no channels to show");
 
         return channels.stream()
                 .map(ChannelMapper.INSTANCE::fromEntityToDto)

@@ -1,8 +1,8 @@
 package com.example.usermicroservice.controller;
 
 import com.example.bussiness.model.ApiResponse;
-import com.example.usermicroservice.bussiness.model.login.LoginRequestDto;
-import com.example.usermicroservice.bussiness.model.signUp.SignUpRequestDto;
+import com.example.usermicroservice.domain.bussiness.model.login.LoginRequestDto;
+import com.example.usermicroservice.domain.bussiness.model.signUp.SignUpRequestDto;
 import com.example.usermicroservice.controller.utils.AuthControllerUtils;
 import com.example.usermicroservice.domain.bussiness.AuthService;
 import jakarta.validation.Valid;
@@ -29,7 +29,6 @@ public class AuthController {
     ) {
         return controllerUtils.handleRequest(bindingResult, () -> userService.login(loginRequest));
     }
-
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> signUp(
             @RequestBody @Valid SignUpRequestDto user,

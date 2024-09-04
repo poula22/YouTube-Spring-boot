@@ -1,12 +1,12 @@
 package com.example.usermicroservice.bussiness;
 
 import com.example.domain.entityException.CustomEntityException;
-import com.example.usermicroservice.bussiness.exception.CustomAuthException;
-import com.example.usermicroservice.bussiness.mapper.SignUpRequestDtoMapper;
-import com.example.usermicroservice.bussiness.mapper.UserMapper;
-import com.example.usermicroservice.bussiness.model.login.LoginRequestDto;
-import com.example.usermicroservice.bussiness.model.AuthResponseDto;
-import com.example.usermicroservice.bussiness.model.signUp.SignUpRequestDto;
+import com.example.usermicroservice.domain.bussiness.exception.CustomAuthException;
+import com.example.usermicroservice.domain.bussiness.mapper.SignUpRequestDtoMapper;
+import com.example.usermicroservice.domain.bussiness.mapper.UserMapper;
+import com.example.usermicroservice.domain.bussiness.model.login.LoginRequestDto;
+import com.example.usermicroservice.domain.bussiness.model.AuthResponseDto;
+import com.example.usermicroservice.domain.bussiness.model.signUp.SignUpRequestDto;
 import com.example.usermicroservice.domain.bussiness.AuthService;
 import com.example.usermicroservice.domain.bussiness.UserService;
 import com.example.usermicroservice.domain.bussiness.helper.EntityHelperImp;
