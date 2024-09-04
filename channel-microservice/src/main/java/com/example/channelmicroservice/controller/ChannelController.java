@@ -18,20 +18,18 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ChannelController {
     private final ChannelService channelService;
-    private final ChannelControllerUtils controllerUtils;
     private final JwtUtil jwtUtil = new JwtUtil();
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> loadChannelById(@PathVariable long id) {
-        return controllerUtils
-                .handleRequest(() -> channelService.loadChannelById(id));
+        return ChannelControllerUtils.handleRequest(() -> channelService.loadChannelById(id));
     }
     @PostMapping
     public ResponseEntity<ApiResponse> addChannel(
             @RequestBody ChannelDto channelDto,
             @RequestHeader("Authorization") String token
     ) {
-        return controllerUtils.handleRequest(() -> {
+        return ChannelControllerUtils.handleRequest(() -> {
             JwtSecurityModel user = jwtUtil.extractUser(token);
             channelService.addChannel(channelDto, user.id());
             return channelDto;
@@ -39,17 +37,16 @@ public class ChannelController {
     }
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> loadAllChannels() {
-        return controllerUtils
-                .handleRequest(channelService::loadAllChannels);
+        return ChannelControllerUtils.handleRequest(channelService::loadAllChannels);
     }
     @GetMapping("/owner/{id}")
     public ResponseEntity<ApiResponse> loadChannelByOwnerId(@PathVariable long id) {
-        return controllerUtils
+        return ChannelControllerUtils
                 .handleRequest(() -> channelService.loadAllChannelsByOwnerId(id));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> removeChannelById(@PathVariable long id) {
-        return controllerUtils.handleRequest(() -> {
+        return ChannelControllerUtils.handleRequest(() -> {
             channelService.removeChannelById(id);
             return "Deleted";
         });
@@ -59,12 +56,12 @@ public class ChannelController {
             @RequestParam String name,
             @RequestParam int page
     ) {
-        return controllerUtils
+        return ChannelControllerUtils
                 .handleRequest(() -> channelService.channelSearchAutoCompleteDto(name, page));
     }
     @GetMapping("/recommend/{category}")
     public ResponseEntity<ApiResponse> getRecommendedChannels(@PathVariable String category) {
-        return controllerUtils
+        return ChannelControllerUtils
                 .handleRequest(() -> channelService.loadRecommendedChannelsByCategory(category));
     }
 }

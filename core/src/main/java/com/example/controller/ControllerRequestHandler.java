@@ -9,7 +9,7 @@ public class ControllerRequestHandler {
             throw new HttpRequestException(error.getDefaultMessage(),400);
     }
 
-    public static  void handleRequest(BindingResult bindingResult)
+    public static void handleRequest(BindingResult bindingResult)
     throws HttpRequestException{
         if (bindingResult!= null && bindingResult.hasErrors()) onError(bindingResult);
     }

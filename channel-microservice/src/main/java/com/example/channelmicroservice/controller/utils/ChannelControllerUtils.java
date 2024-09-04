@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ChannelControllerUtils {
-    public <T> ResponseEntity<ApiResponse> handleRequest(ChannelHandler<T> apiHandler) {
+    public static  <T> ResponseEntity<ApiResponse> handleRequest(ChannelHandler<T> apiHandler) {
         try {
             T response = apiHandler.handle();
             return ResponseEntity.ok( new ApiResponse.Success<>(response) );
