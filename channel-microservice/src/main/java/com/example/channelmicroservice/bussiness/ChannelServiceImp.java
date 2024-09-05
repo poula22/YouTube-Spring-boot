@@ -2,7 +2,8 @@ package com.example.channelmicroservice.bussiness;
 
 import com.example.channelmicroservice.domain.bussiness.exception.ChannelException;
 import com.example.channelmicroservice.domain.bussiness.mapper.ChannelMapper;
-import com.example.channelmicroservice.domain.bussiness.model.ChannelDto;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelRequestDto;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelResponseDto;
 import com.example.channelmicroservice.domain.bussiness.model.ChannelSearchAutoCompleteDto;
 import com.example.channelmicroservice.domain.bussiness.ChannelService;
 import com.example.channelmicroservice.domain.entity.ChannelEntity;
@@ -32,12 +33,12 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public ChannelDto addChannel(ChannelDto channel, long ownerId) throws ChannelException {
+    public ChannelResponseDto addChannel(ChannelRequestDto channel, long ownerId) throws ChannelException {
         try {
             ChannelEntity entity = ChannelMapper.INSTANCE.fromDtoToEntity(channel, ownerId);
             log.info(entity.toString());
             channelRepository.save(entity);
-            return channel;
+            return ChannelMapper.INSTANCE.fromEntityToDto(entity);
         } catch (Exception e) {
             log.info(e.getMessage());
             throw new ChannelException(400, "channel already exist");
@@ -45,7 +46,7 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public ChannelDto updateChannelName(String newName, long channelId, long ownerId) throws ChannelException {
+    public ChannelResponseDto updateChannelName(String newName, long channelId, long ownerId) throws ChannelException {
         ChannelEntity entity = channelRepository.findFirstByName(newName);
         if (entity != null) throw new ChannelException(400, "Name already exist");
 
@@ -66,7 +67,7 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> loadAllChannels() throws ChannelException {
+    public List<ChannelResponseDto> loadAllChannels() throws ChannelException {
         var channels = channelRepository.findAll();
 
         if (channels.isEmpty()) throw new ChannelException(404, "No Channel Found");
@@ -78,7 +79,7 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> loadAllChannelsByOwnerId(long ownerId) throws ChannelException {
+    public List<ChannelResponseDto> loadAllChannelsByOwnerId(long ownerId) throws ChannelException {
         final List<ChannelEntity> channels = channelRepository.findAllByOwnerId(ownerId);
         if (channels.isEmpty()) throw new ChannelException(200, "user doesn't have any channel yet");
         return channels.stream()
@@ -87,11 +88,14 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> loadAllChannelsByOwnerName(String ownerName) throws ChannelException {
+    public List<ChannelSearchAutoCompleteDto> loadAllChannelsByOwnerName(String ownerName) throws ChannelException {
         var channels = channelRepository.searchAllByName(ownerName);
         if (channels.isEmpty()) throw new ChannelException(200, "user doesn't have any channel yet");
         return channels.stream()
-                .map(ChannelMapper.INSTANCE::fromEntityToDto)
+                .map(channelEntity -> new ChannelSearchAutoCompleteDto(
+                        channelEntity.getId(),
+                        channelEntity.getCategory()
+                ))
                 .toList();
     }
 
@@ -123,13 +127,16 @@ public class ChannelServiceImp implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> loadRecommendedChannelsByCategory(String category) throws ChannelException {
+    public List<ChannelSearchAutoCompleteDto> loadRecommendedChannelsByCategory(String category) throws ChannelException {
         var channels = channelRepository.findAllByCategory(category, Limit.of(5));
 
         if (channels.isEmpty()) throw new ChannelException(200, "no channels to show");
 
         return channels.stream()
-                .map(ChannelMapper.INSTANCE::fromEntityToDto)
+                .map(channelEntity -> new ChannelSearchAutoCompleteDto(
+                        channelEntity.getId(),
+                        channelEntity.getCategory()
+                ))
                 .toList();
     }
 }

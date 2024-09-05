@@ -35,8 +35,8 @@ public class VideoServiceImp implements VideoService {
     @Override
     public VideoDto addVideo(VideoDto videoDto) throws VideoException {
         //send video to server and get url
-        String date = Instant.now().toString();
-        VideoEntity videoEntity = VideoMapper.INSTANCE.fromDtoToEntity(videoDto,date);
+        final String date = Instant.now().toString();
+        final VideoEntity videoEntity = VideoMapper.INSTANCE.fromDtoToEntity(videoDto,date);
         try {
             videoRepository.save(videoEntity);
         } catch (Exception e) {

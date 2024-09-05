@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -29,6 +30,9 @@ public class ChannelEntity {
     @Basic
     @Column(name = "category")
     private String category;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channelId", cascade = CascadeType.ALL)
+    List<VideoEntity> videoEntityList;
 
     @Override
     public boolean equals(Object o) {

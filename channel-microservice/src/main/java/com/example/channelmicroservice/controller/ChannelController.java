@@ -1,7 +1,7 @@
 package com.example.channelmicroservice.controller;
 
 import com.example.bussiness.model.ApiResponse;
-import com.example.channelmicroservice.domain.bussiness.model.ChannelDto;
+import com.example.channelmicroservice.domain.bussiness.model.ChannelRequestDto;
 import com.example.channelmicroservice.domain.bussiness.model.ChannelUpdateDto;
 import com.example.channelmicroservice.controller.utils.ChannelControllerUtils;
 import com.example.channelmicroservice.domain.bussiness.ChannelService;
@@ -27,7 +27,7 @@ public class ChannelController {
     }
     @PostMapping
     public ResponseEntity<ApiResponse> addChannel(
-            @RequestBody ChannelDto channelDto,
+            @RequestBody ChannelRequestDto channelDto,
             @RequestHeader("Authorization") String token
     ) {
         return ChannelControllerUtils.handleRequest(() -> {
